@@ -2,35 +2,31 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Lirik Lagu</title>
+  <title>Camera Test</title>
   <style>
     body {
-      background:#0d0d0d;
-      color:#eaeaea;
-      font-family: Arial;
       margin:0;
-      padding:20px;
+      background:#0d0d0d;
+      color:#fff;
+      font-family: Arial, sans-serif;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
     }
-    h1 {
-      text-align:center;
-      color:#00ffcc;
-    }
-    .box {
-      background:#1a1a1a;
-      padding:15px;
-      border-radius:12px;
-      margin-top:20px;
-      line-height:1.6;
-      max-height:60vh;
-      overflow-y:auto;
+    video {
+      width:90%;
+      max-width:400px;
+      border-radius:16px;
+      background:#000;
     }
     button {
-      width:100%;
-      padding:12px;
-      margin-top:15px;
+      margin-top:20px;
+      padding:12px 20px;
       font-size:16px;
       border:none;
-      border-radius:10px;
+      border-radius:12px;
       background:#00ffcc;
       color:#000;
     }
@@ -38,24 +34,27 @@
 </head>
 <body>
 
-<h1>🎵 Lirik Lagu 🎵</h1>
+<h2>🎥 Camera Preview</h2>
 
-<div class="box">
-  <b>Judul:</b> Kesepian  
-  <br><br>
-  Saat malam sepi sendiri  
-  Ku teringat wajahmu lagi  
-  Hati ini terasa hampa  
-  Tanpamu di sisiku  
+<video id="video" autoplay playsinline muted></video>
 
-  <br><br>
-  Ku coba bertahan sendiri  
-  Meski perih mengiris hati  
-</div>
+<button onclick="startCamera()">Start Camera</button>
 
-<button onclick="alert('Fitur play lagu menyusul 😁')">
-▶️ Play Lagu
-</button>
+<script>
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    });
+    const video = document.getElementById('video');
+    video.srcObject = stream;
+  } catch (err) {
+    alert("Kamera atau mic ditolak 😭");
+    console.error(err);
+  }
+}
+</script>
 
 </body>
 </html>
