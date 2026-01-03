@@ -1,22 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <title>Random Cam</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   background: #0b0b0b;
   color: #fff;
   font-family: Arial, sans-serif;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
+/* STATUS BAR */
 #statusBar {
   height: 50px;
   background: #111;
@@ -27,21 +32,34 @@ body {
   color: #aaa;
 }
 
+/* VIDEO AREA */
 #videoContainer {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: relative;
   background: #000;
 }
 
-video {
-<div id="videoContainer">
-  <video id="video" autoplay playsinline muted></video>
-  <video id="partner" autoplay loop muted></video>
-</div>
+#video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
+/* PARTNER PALSU */
+#partner {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 120px;
+  height: 160px;
+  background: #222;
+  border-radius: 12px;
+  object-fit: cover;
+  display: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.8);
+}
+
+/* CONTROL BUTTON */
 #controls {
   height: 90px;
   background: #111;
@@ -56,6 +74,7 @@ button {
   border: none;
   border-radius: 25px;
   font-size: 14px;
+  font-weight: bold;
 }
 
 .start {
@@ -72,23 +91,7 @@ button {
   background: #ff4444;
   color: #fff;
 }
-</style> #videoContainer {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-#partner {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 120px;
-  height: 160px;
-  background: #222;
-  border-radius: 12px;
-  object-fit: cover;
-  display: none;
-}
+</style>
 </head>
 
 <body>
@@ -97,6 +100,15 @@ button {
 
 <div id="videoContainer">
   <video id="video" autoplay playsinline muted></video>
+
+  <!-- PARTNER DUMMY -->
+  <video
+    id="partner"
+    src="https://www.w3schools.com/html/mov_bbb.mp4"
+    autoplay
+    loop
+    muted>
+  </video>
 </div>
 
 <div id="controls">
@@ -110,42 +122,40 @@ let stream = null;
 
 async function startCamera() {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    });
     video.srcObject = stream;
-    document.getElementById("statusBar").innerText = "Camera ON";
-  } catch(e) {
-    alert("Camera permission denied");
+    statusBar.innerText = "Camera ON";
+  } catch (e) {
+    alert("Izin kamera ditolak 😭");
   }
 }
 
 function stopCamera() {
-  if(stream){
+  if (stream) {
     stream.getTracks().forEach(t => t.stop());
     video.srcObject = null;
     stream = null;
   }
-  document.getElementById("statusBar").innerText = "Camera OFF";
+  partner.style.display = "none";
+  statusBar.innerText = "Camera OFF";
 }
 
 function nextAction() {
-  if(!stream){
-    alert("Start camera dulu bro 😅");
+  if (!stream) {
+    alert("Start kamera dulu bro 😅");
     return;
   }
 
   statusBar.innerText = "Searching partner...";
   partner.style.display = "none";
 
-  setTimeout(()=>{
+  setTimeout(() => {
     statusBar.innerText = "Partner found 🎉";
     partner.style.display = "block";
   }, 2000);
-}
-  }
-  document.getElementById("statusBar").innerText = "Searching partner...";
-  setTimeout(()=>{
-    document.getElementById("statusBar").innerText = "Partner found (UI only)";
-  },2000);
 }
 </script>
 
