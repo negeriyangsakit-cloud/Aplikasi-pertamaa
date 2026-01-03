@@ -80,7 +80,51 @@ function stopCamera() {
     document.getElementById('status').innerText = "Camera OFF ❌";
   }
 }
-</script>
+<div class="status" id="status">Camera OFF</div>
+<div class="status" id="match">Idle</div>
 
-</body>
-</html>
+<button onclick="startCamera()">Start Camera</button>
+<button onclick="findPartner()">Next</button>
+<button class="stop" onclick="stopCamera()">Stop</button>
+  <script>
+let stream = null;
+let searching = false;
+
+async function startCamera() {
+  stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
+  video.srcObject = stream;
+  status.innerText = "Camera ON ✅";
+}
+
+function stopCamera() {
+  if(stream){
+    stream.getTracks().forEach(t => t.stop());
+    video.srcObject = null;
+  }
+  searching = false;
+  status.innerText = "Camera OFF ❌";
+  match.innerText = "Idle";
+}
+
+function findPartner() {
+  if (!stream) {
+    alert("Start camera dulu bro 😅");
+    return;
+  }
+
+  searching = true;
+  let count = 3;
+  match.innerText = "Searching partner... " + count;
+
+  const timer = setInterval(() => {
+    count--;
+    match.innerText = "Searching partner... " + count;
+    if (count === 0) {
+      clearInterval(timer);
+      if (searching) {
+        match.innerText = "Partner found 🎉 (dummy)";
+      }
+    }
+  }, 1000);
+}
+</script>
