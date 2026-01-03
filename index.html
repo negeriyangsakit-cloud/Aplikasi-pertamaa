@@ -2,161 +2,174 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Random Cam</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random VC</title>
 
 <style>
 * {
   box-sizing: border-box;
+  font-family: Arial, sans-serif;
 }
 
 body {
   margin: 0;
-  background: #0b0b0b;
+  background: #0e0e0e;
   color: #fff;
-  font-family: Arial, sans-serif;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
 /* STATUS BAR */
-#statusBar {
-  height: 50px;
+#status {
+  padding: 12px;
+  text-align: center;
   background: #111;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   font-size: 14px;
-  color: #aaa;
 }
 
 /* VIDEO AREA */
-#videoContainer {
-  flex: 1;
+#video-area {
   position: relative;
+  width: 100%;
+  height: 70vh;
   background: #000;
 }
 
-#video {
+video {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* PARTNER PALSU */
-#partner {
+/* SELF VIDEO */
+#selfVideo {
   position: absolute;
-  top: 10px;
+  bottom: 10px;
   right: 10px;
   width: 120px;
   height: 160px;
-  background: #222;
-  border-radius: 12px;
-  object-fit: cover;
-  display: none;
-  box-shadow: 0 0 10px rgba(0,0,0,0.8);
+  border-radius: 8px;
+  border: 2px solid #fff;
+  background: #000;
 }
 
-/* CONTROL BUTTON */
+/* SEARCH OVERLAY */
+#searching {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #555;
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* CONTROLS */
 #controls {
-  height: 90px;
-  background: #111;
   display: flex;
   justify-content: space-around;
-  align-items: center;
+  padding: 12px;
+  background: #111;
 }
 
 button {
-  width: 80px;
-  height: 50px;
+  padding: 10px 18px;
   border: none;
-  border-radius: 25px;
+  border-radius: 6px;
   font-size: 14px;
-  font-weight: bold;
+  cursor: pointer;
 }
 
-.start {
-  background: #00ffcc;
-  color: #000;
-}
+#start { background: #2ecc71; }
+#next  { background: #3498db; }
+#stop  { background: #e74c3c; }
+#report{ background: #f39c12; }
 
-.next {
-  background: #ffaa00;
-  color: #000;
-}
-
-.stop {
-  background: #ff4444;
-  color: #fff;
+button:active {
+  opacity: 0.8;
 }
 </style>
 </head>
 
 <body>
 
-<div id="statusBar">Camera OFF</div>
+<div id="status">🟢 Siap</div>
 
-<div id="videoContainer">
-  <video id="video" autoplay playsinline muted></video>
+<div id="video-area">
+  <!-- PARTNER (FAKE) -->
+  <video id="partnerVideo" autoplay muted playsinline></video>
 
-  <!-- PARTNER DUMMY -->
-  <video
-    id="partner"
-    src="https://www.w3schools.com/html/mov_bbb.mp4"
-    autoplay
-    loop
-    muted>
-  </video>
+  <!-- SELF -->
+  <video id="selfVideo" autoplay muted playsinline></video>
+
+  <!-- SEARCHING -->
+  <div id="searching">
+    <div class="loader"></div>
+    <p style="margin-top:10px;">Searching partner...</p>
+  </div>
 </div>
 
 <div id="controls">
-  <button class="start" onclick="startCamera()">Start</button>
-  <button class="next" onclick="nextAction()">Next</button>
-  <button class="stop" onclick="stopCamera()">Stop</button>
+  <button id="start">Start</button>
+  <button id="next">Next</button>
+  <button id="stop">Stop</button>
+  <button id="report">Report</button>
 </div>
 
 <script>
 let stream = null;
 
+const selfVideo = document.getElementById("selfVideo");
+const partnerVideo = document.getElementById("partnerVideo");
+const statusText = document.getElementById("status");
+const searching = document.getElementById("searching");
+
 async function startCamera() {
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
-    });
-    video.srcObject = stream;
-    statusBar.innerText = "Camera ON";
-  } catch (e) {
-    alert("Izin kamera ditolak 😭");
-  }
+  stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+  selfVideo.srcObject = stream;
+
+  fakeSearching();
 }
 
 function stopCamera() {
   if (stream) {
     stream.getTracks().forEach(t => t.stop());
-    video.srcObject = null;
     stream = null;
   }
-  partner.style.display = "none";
-  statusBar.innerText = "Camera OFF";
+  selfVideo.srcObject = null;
+  partnerVideo.srcObject = null;
+  statusText.innerText = "⛔ Kamera mati";
 }
 
-function nextAction() {
-  if (!stream) {
-    alert("Start kamera dulu bro 😅");
-    return;
-  }
-
-  statusBar.innerText = "Searching partner...";
-  partner.style.display = "none";
+function fakeSearching() {
+  searching.style.display = "flex";
+  statusText.innerText = "🟡 Searching partner...";
 
   setTimeout(() => {
-    statusBar.innerText = "Partner found 🎉";
-    partner.style.display = "block";
+    searching.style.display = "none";
+    statusText.innerText = "🔴 Connected";
+    partnerVideo.srcObject = stream; // fake partner
   }, 2000);
 }
+
+document.getElementById("start").onclick = startCamera;
+document.getElementById("next").onclick = fakeSearching;
+document.getElementById("stop").onclick = stopCamera;
+
+document.getElementById("report").onclick = () => {
+  alert("⚠️ Report terkirim\n(Pelanggaran berat akan dibanned)");
+};
 </script>
 
 </body>
