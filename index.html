@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Camera Test</title>
+  <title>Camera Control</title>
   <style>
     body {
       margin:0;
@@ -20,15 +20,26 @@
       max-width:400px;
       border-radius:16px;
       background:#000;
+      box-shadow: 0 0 20px rgba(0,255,204,0.4);
+    }
+    .status {
+      margin-top:10px;
+      font-size:14px;
+      color:#aaa;
     }
     button {
-      margin-top:20px;
+      margin:10px;
       padding:12px 20px;
       font-size:16px;
       border:none;
       border-radius:12px;
       background:#00ffcc;
       color:#000;
+      width:160px;
+    }
+    .stop {
+      background:#ff4d4d;
+      color:#fff;
     }
   </style>
 </head>
@@ -38,20 +49,35 @@
 
 <video id="video" autoplay playsinline muted></video>
 
+<div class="status" id="status">Camera OFF</div>
+
 <button onclick="startCamera()">Start Camera</button>
+<button class="stop" onclick="stopCamera()">Stop Camera</button>
 
 <script>
+let stream = null;
+
 async function startCamera() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    stream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true
     });
     const video = document.getElementById('video');
     video.srcObject = stream;
+    document.getElementById('status').innerText = "Camera ON ✅";
   } catch (err) {
-    alert("Kamera atau mic ditolak 😭");
+    alert("Izin kamera/mic ditolak 😭");
     console.error(err);
+  }
+}
+
+function stopCamera() {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+    stream = null;
+    document.getElementById('video').srcObject = null;
+    document.getElementById('status').innerText = "Camera OFF ❌";
   }
 }
 </script>
