@@ -1,130 +1,126 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Camera Control</title>
-  <style>
-    body {
-      margin:0;
-      background:#0d0d0d;
-      color:#fff;
-      font-family: Arial, sans-serif;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      height:100vh;
-    }
-    video {
-      width:90%;
-      max-width:400px;
-      border-radius:16px;
-      background:#000;
-      box-shadow: 0 0 20px rgba(0,255,204,0.4);
-    }
-    .status {
-      margin-top:10px;
-      font-size:14px;
-      color:#aaa;
-    }
-    button {
-      margin:10px;
-      padding:12px 20px;
-      font-size:16px;
-      border:none;
-      border-radius:12px;
-      background:#00ffcc;
-      color:#000;
-      width:160px;
-    }
-    .stop {
-      background:#ff4d4d;
-      color:#fff;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Random Cam</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #0b0b0b;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#statusBar {
+  height: 50px;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #aaa;
+}
+
+#videoContainer {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#controls {
+  height: 90px;
+  background: #111;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+button {
+  width: 80px;
+  height: 50px;
+  border: none;
+  border-radius: 25px;
+  font-size: 14px;
+}
+
+.start {
+  background: #00ffcc;
+  color: #000;
+}
+
+.next {
+  background: #ffaa00;
+  color: #000;
+}
+
+.stop {
+  background: #ff4444;
+  color: #fff;
+}
+</style>
 </head>
+
 <body>
 
-<h2>🎥 Camera Preview</h2>
+<div id="statusBar">Camera OFF</div>
 
-<video id="video" autoplay playsinline muted></video>
+<div id="videoContainer">
+  <video id="video" autoplay playsinline muted></video>
+</div>
 
-<div class="status" id="status">Camera OFF</div>
-
-<button onclick="startCamera()">Start Camera</button>
-<button class="stop" onclick="stopCamera()">Stop Camera</button>
+<div id="controls">
+  <button class="start" onclick="startCamera()">Start</button>
+  <button class="next" onclick="nextAction()">Next</button>
+  <button class="stop" onclick="stopCamera()">Stop</button>
+</div>
 
 <script>
 let stream = null;
 
 async function startCamera() {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
-    });
-    const video = document.getElementById('video');
+    stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
     video.srcObject = stream;
-    document.getElementById('status').innerText = "Camera ON ✅";
-  } catch (err) {
-    alert("Izin kamera/mic ditolak 😭");
-    console.error(err);
+    document.getElementById("statusBar").innerText = "Camera ON";
+  } catch(e) {
+    alert("Camera permission denied");
   }
-}
-
-function stopCamera() {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-    stream = null;
-    document.getElementById('video').srcObject = null;
-    document.getElementById('status').innerText = "Camera OFF ❌";
-  }
-}
-<div class="status" id="status">Camera OFF</div>
-<div class="status" id="match">Idle</div>
-
-<button onclick="startCamera()">Start Camera</button>
-<button onclick="findPartner()">Next</button>
-<button class="stop" onclick="stopCamera()">Stop</button>
-  <script>
-let stream = null;
-let searching = false;
-
-async function startCamera() {
-  stream = await navigator.mediaDevices.getUserMedia({ video:true, audio:true });
-  video.srcObject = stream;
-  status.innerText = "Camera ON ✅";
 }
 
 function stopCamera() {
   if(stream){
     stream.getTracks().forEach(t => t.stop());
     video.srcObject = null;
+    stream = null;
   }
-  searching = false;
-  status.innerText = "Camera OFF ❌";
-  match.innerText = "Idle";
+  document.getElementById("statusBar").innerText = "Camera OFF";
 }
 
-function findPartner() {
-  if (!stream) {
+function nextAction() {
+  if(!stream){
     alert("Start camera dulu bro 😅");
     return;
   }
-
-  searching = true;
-  let count = 3;
-  match.innerText = "Searching partner... " + count;
-
-  const timer = setInterval(() => {
-    count--;
-    match.innerText = "Searching partner... " + count;
-    if (count === 0) {
-      clearInterval(timer);
-      if (searching) {
-        match.innerText = "Partner found 🎉 (dummy)";
-      }
-    }
-  }, 1000);
+  document.getElementById("statusBar").innerText = "Searching partner...";
+  setTimeout(()=>{
+    document.getElementById("statusBar").innerText = "Partner found (UI only)";
+  },2000);
 }
 </script>
+
+</body>
+</html>
