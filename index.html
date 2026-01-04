@@ -185,7 +185,7 @@ button {
 <div id="reportBox">
   <div id="reportContent">
     <h3>⚠️ Report User</h3>
-    <label><input type="checkbox"> Menunjukkan alat kelamin</label><br>
+    <label><input type="checkbox"> Menunjukkan alat kelamin atau kanyut</label><br>
     <label><input type="checkbox"> Aktivitas seksual</label><br>
     <label><input type="checkbox"> Perilaku tidak pantas</label><br><br>
     <button onclick="submitReport()">Kirim</button>
@@ -232,7 +232,7 @@ function sendMsg() {
   if (!input.value) return;
   addMsg(input.value, "me");
   input.value = "";
-  setTimeout(() => fakeReply("wkwkwk 😂"), 1000);
+  setTimeout(() => fakeReply("aplikasi belum siap😂"), 1000);
 }
 
 function addMsg(text, cls) {
